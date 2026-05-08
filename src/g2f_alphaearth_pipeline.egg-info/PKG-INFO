@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: g2f-alphaearth-pipeline
+Version: 0.1.0
+Summary: Beginner-friendly embedding pipeline for Genomes to Fields using AlphaEarth Foundations.
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=2.1.0
+Requires-Dist: pandas>=2.2.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.3.0; extra == "dev"
+Provides-Extra: ee
+Requires-Dist: earthengine-api>=1.6.0; extra == "ee"

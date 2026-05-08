@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+src/g2f_embeddings/_init_.py
+src/g2f_embeddings/earth_engine.py
+src/g2f_embeddings/io_utils.py
+src/g2f_embeddings/pipeline.py
+src/g2f_embeddings.egg-info/PKG-INFO
+src/g2f_embeddings.egg-info/SOURCES.txt
+src/g2f_embeddings.egg-info/dependency_links.txt
+src/g2f_embeddings.egg-info/top_level.txt
+tests/test_pipeline.py

@@ -1,0 +1,16 @@
+input:
+  fields_path: data/sample/fields.csv
+  environment_path: data/sample/environment.csv
+
+output:
+  embeddings_path: data/outputs/g2f_embeddings.csv
+
+pipeline:
+  mode: mock
+  field_id_column: field_id
+  year_column: year
+  longitude_column: longitude
+  latitude_column: latitude
+  scale_meters: 30
+  embedding_band_count: 64
+  alphaearth_collection: GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL

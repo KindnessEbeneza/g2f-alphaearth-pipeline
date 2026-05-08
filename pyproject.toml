@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g2f-alphaearth-pipeline"
+version = "0.1.0"
+description = "Beginner-friendly embedding pipeline for Genomes to Fields using AlphaEarth Foundations."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "numpy>=2.1.0",
+  "pandas>=2.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+]
+ee = [
+  "earthengine-api>=1.6.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
