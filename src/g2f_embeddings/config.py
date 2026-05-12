@@ -17,11 +17,18 @@ class PipelineConfig:
     scale_meters: int
     embedding_band_count: int
     alphaearth_collection: str
+    buffer_meters: int = 100
+    cropland_mask: str = "USDA_CDL"
+    cropland_fraction_threshold: float = 0.5
+    
+    
+    
 
 
 def load_config(config_path: str | Path) -> PipelineConfig:
     path = Path(config_path)
     raw = _load_yaml_like(path.read_text())
+    
 
     return PipelineConfig(
         fields_path=Path(raw["input"]["fields_path"]),
@@ -35,6 +42,9 @@ def load_config(config_path: str | Path) -> PipelineConfig:
         scale_meters=int(raw["pipeline"]["scale_meters"]),
         embedding_band_count=int(raw["pipeline"]["embedding_band_count"]),
         alphaearth_collection=raw["pipeline"]["alphaearth_collection"],
+        buffer_meters=int(raw["pipeline"].get("buffer_meters", 100)),
+        cropland_mask=raw["pipeline"].get("cropland_mask", "USDA_CDL"),
+        cropland_fraction_threshold=float(raw["pipeline"].get("cropland_fraction_threshold", 0.5)),
     )
 
 

@@ -3,7 +3,11 @@ from __future__ import annotations
 import pandas as pd
 
 from .config import PipelineConfig
-from .earth_engine import build_alphaearth_embeddings, build_mock_embeddings
+from .earth_engine import (
+    build_alphaearth_embeddings,
+    build_cropland_buffered_alphaearth_embeddings,
+    build_mock_embeddings,
+)
 from .io_utils import ensure_parent_dir, load_environment, load_fields
 
 
@@ -56,11 +60,12 @@ def run_pipeline(config: PipelineConfig) -> pd.DataFrame:
             config.latitude_column,
             config.embedding_band_count,
         )
-    elif config.mode == "earth-engine":
-        embeddings = build_alphaearth_embeddings(fields, config)
+    elif config.mode == "earth-engine-cropland-buffer":
+        embeddings = build_cropland_buffered_alphaearth_embeddings(fields, config)
+        
     else:
         raise ValueError(
-            f"Unsupported pipeline mode '{config.mode}'. Use 'mock' or 'earth-engine'."
+            f"Unsupported pipeline mode '{config.mode}'. Use 'mock' or 'earth-engine' or 'earth-engine-cropland-buffer'."
         )
 
     merged = embeddings.merge(

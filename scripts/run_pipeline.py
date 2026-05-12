@@ -22,7 +22,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--mode",
-        choices=["mock", "earth-engine"],
+        choices=["mock", "earth-engine", "earth-engine-cropland-buffer"],
         help="Override the mode from the config file.",
     )
     parser.add_argument(
