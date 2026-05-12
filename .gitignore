@@ -1,0 +1,27 @@
+cat > .gitignore <<'EOF'
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Virtual env
+.venv/
+
+# Data and generated outputs
+data/outputs/
+data/real/
+data/sample/merged_pheno.csv
+
+configs/_tmp
+
+# Credentials/secrets
+.credentials/
+*.json
+.env
+
+# VS Code / OS
+.vscode/
+.DS_Store
+EOF
