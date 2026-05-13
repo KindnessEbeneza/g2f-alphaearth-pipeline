@@ -5,7 +5,8 @@ src/g2f_alphaearth_pipeline.egg-info/SOURCES.txt
 src/g2f_alphaearth_pipeline.egg-info/dependency_links.txt
 src/g2f_alphaearth_pipeline.egg-info/requires.txt
 src/g2f_alphaearth_pipeline.egg-info/top_level.txt
-src/g2f_embeddings/_init_.py
+src/g2f_embeddings/__init__.py
+src/g2f_embeddings/config.py
 src/g2f_embeddings/earth_engine.py
 src/g2f_embeddings/io_utils.py
 src/g2f_embeddings/pipeline.py
