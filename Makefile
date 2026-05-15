@@ -21,3 +21,6 @@ preview:
 
 test:
 	pytest -q
+
+run-clean:
+	python scripts/workflows/run_clean_embeddings.py --config configs/clean_embedding_workflow.yaml

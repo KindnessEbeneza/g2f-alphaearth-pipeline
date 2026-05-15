@@ -20,7 +20,11 @@ class PipelineConfig:
     buffer_meters: int = 100
     cropland_mask: str = "USDA_CDL"
     cropland_fraction_threshold: float = 0.5
-    
+    aggregation_method: str = "masked_mean"
+    use_ndvi_filter: bool = False
+    ndvi_min: float = 0.15
+    ndvi_max: float = 0.85
+    sentinel2_collection: str = "COPERNICUS/S2_SR_HARMONIZED"
     
     
 
@@ -45,6 +49,14 @@ def load_config(config_path: str | Path) -> PipelineConfig:
         buffer_meters=int(raw["pipeline"].get("buffer_meters", 100)),
         cropland_mask=raw["pipeline"].get("cropland_mask", "USDA_CDL"),
         cropland_fraction_threshold=float(raw["pipeline"].get("cropland_fraction_threshold", 0.5)),
+        aggregation_method=raw["pipeline"].get("aggregation_method", "masked_mean"),
+        use_ndvi_filter=bool(raw["pipeline"].get("use_ndvi_filter", False)),
+        ndvi_min=float(raw["pipeline"].get("ndvi_min", 0.15)),
+        ndvi_max=float(raw["pipeline"].get("ndvi_max", 0.85)),
+        sentinel2_collection=raw["pipeline"].get(
+           "sentinel2_collection",
+           "COPERNICUS/S2_SR_HARMONIZED",
+        ),
     )
 
 
