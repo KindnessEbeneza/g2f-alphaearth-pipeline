@@ -13,8 +13,8 @@ __pycache__/
 data/outputs/
 data/real/
 data/sample/merged_pheno.csv
-
-configs/_tmp
+data/experiments/
+configs/_tmp_*.yaml
 
 # Credentials/secrets
 .credentials/

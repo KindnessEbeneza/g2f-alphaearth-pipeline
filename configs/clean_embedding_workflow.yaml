@@ -1,0 +1,20 @@
+input:
+  raw_csv: data/sample/merged_pheno.csv
+
+columns:
+  field_id: Field Location
+  year: Year
+  latitude: Latitude
+  longitude: Longitude
+
+preprocess:
+  output_dir: data/real
+  min_year: 2017
+  max_rows: 10
+
+pipeline:
+  config_path: configs/real_pipeline.yaml
+  mode: earth-engine-cropland-buffer
+
+reports:
+  output_dir: data/outputs/reports

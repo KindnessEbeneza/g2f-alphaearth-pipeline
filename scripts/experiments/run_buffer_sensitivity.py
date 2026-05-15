@@ -34,6 +34,11 @@ pipeline:
   buffer_meters: {buffer_meters}
   cropland_mask: USDA_CDL
   cropland_fraction_threshold: 0.5
+  aggregation_method: weighted_distance
+  use_ndvi_filter: true
+  ndvi_min: 0.15
+  ndvi_max: 0.85
+  sentinel2_collection: COPERNICUS/S2_SR_HARMONIZED  
 """
     )
 
