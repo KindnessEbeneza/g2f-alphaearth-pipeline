@@ -1,3 +1,8 @@
+"""
+Experimental script to extract AlphaEarth embeddings using a specific
+field boundary polygon rather than a circular buffer.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -18,6 +23,7 @@ def band_names(count: int = EMBEDDING_BAND_COUNT) -> list[str]:
 
 
 def parse_args() -> argparse.Namespace:
+    """Parses command-line arguments for the polygon extraction script."""
     parser = argparse.ArgumentParser(
         description="Extract AlphaEarth embedding inside a selected FTW field polygon."
     )
@@ -76,6 +82,11 @@ def polygon_to_ee_geometry(path: Path) -> ee.Geometry:
 
 
 def main() -> None:
+    """
+    Main logic: Reads a GeoJSON polygon, interfaces with Earth Engine, 
+    fetches the AlphaEarth composite bounded by the polygon, aggregates 
+    the pixels, and saves the vector to a CSV.
+    """
     args = parse_args()
 
     polygon_path = Path(args.polygon)

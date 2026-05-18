@@ -1,3 +1,9 @@
+"""
+Handles the integration with Google Earth Engine for generating AlphaEarth embeddings.
+Includes functions for authentication, basic point-based extraction, and advanced
+buffered extraction with agricultural masking.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -12,6 +18,10 @@ from .config import PipelineConfig
 
 
 def initialize_earth_engine() -> None:
+    """
+    Initializes the Google Earth Engine API using the Google Cloud project ID
+    specified in the 'EE_PROJECT' environment variable.
+    """
     try:
         import ee
     except ModuleNotFoundError as exc:
@@ -47,6 +57,10 @@ def build_mock_embeddings(
     latitude_column: str,
     embedding_band_count: int,
 ) -> pd.DataFrame:
+    """
+    Generates deterministic pseudo-random embeddings for testing the pipeline 
+    without requiring internet access or valid Earth Engine credentials.
+    """
     rows: list[dict[str, object]] = []
 
     for _, row in fields.iterrows():
@@ -126,6 +140,12 @@ def build_alphaearth_embeddings(
     fields: pd.DataFrame,
     config: PipelineConfig,
 ) -> pd.DataFrame:
+    """
+    Extracts point-based AlphaEarth embeddings for each field location.
+    
+    This function groups requests by year to fetch the corresponding annual composite
+    and extracts the embedding directly at the provided coordinate without spatial buffering.
+    """
     initialize_earth_engine()
 
     all_rows: list[pd.DataFrame] = []
@@ -261,6 +281,14 @@ def build_cropland_buffered_alphaearth_embeddings(
     fields: pd.DataFrame,
     config: PipelineConfig,
 ) -> pd.DataFrame:
+    """
+    Extracts embeddings for fields using a buffered region and agricultural masking.
+    
+    1. Creates a circular buffer around each coordinate.
+    2. Applies a USDA CDL cropland mask (and optionally an NDVI mask) to filter out non-agricultural pixels.
+    3. Aggregates the AlphaEarth embeddings across the masked region using the specified method (e.g., mean).
+    4. Computes confidence scores based on the proportion of valid cropland pixels found.
+    """
     initialize_earth_engine()
 
     rows: list[dict[str, object]] = []

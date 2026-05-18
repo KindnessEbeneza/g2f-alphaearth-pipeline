@@ -1,3 +1,8 @@
+"""
+Utility script to find the nearest field boundary polygon to a given coordinate.
+Useful for matching approximate trial coordinates with detected crop fields.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -9,6 +14,7 @@ from shapely.geometry import Point
 
 
 def parse_args() -> argparse.Namespace:
+    """Parses command-line arguments for the nearest polygon selection script."""
     parser = argparse.ArgumentParser(
         description="Select the nearest FTW polygon to a site coordinate."
     )
@@ -60,6 +66,11 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """
+    Main execution: Loads the full set of polygons, computes distances 
+    to the given site coordinate, selects the nearest one, validates the 
+    distance, and saves the selected polygon as GeoJSON.
+    """
     args = parse_args()
 
     polygons_path = Path(args.polygons)

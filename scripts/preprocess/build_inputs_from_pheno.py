@@ -1,3 +1,9 @@
+"""
+Data preprocessing script for Genomes to Fields (G2F).
+Takes a raw phenotype CSV, standardizes column names, filters by year,
+and splits it into pipeline-ready `fields.csv` and `environment.csv`.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -40,6 +46,7 @@ COMMON_COLUMN_ALIASES = {
 
 
 def parse_args() -> argparse.Namespace:
+    """Parses command-line arguments for the preprocessing script."""
     parser = argparse.ArgumentParser(
         description="Build AlphaEarth-ready input tables from a merged phenotype CSV."
     )
@@ -124,6 +131,10 @@ def standardize_core_columns(
 
 
 def build_fields_table(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Extracts a unique table of field locations and coordinates
+    required by the AlphaEarth extraction engine.
+    """
     fields = (
         df[["field_id", "year", "longitude", "latitude"]]
         .drop_duplicates()
@@ -178,6 +189,10 @@ def build_site_year_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main() -> None:
+    """
+    Executes the preprocessing logic: parses arguments, infers columns, 
+    cleans the data, and exports `fields.csv` and `environment.csv`.
+    """
     args = parse_args()
     input_path = Path(args.input)
     output_dir = Path(args.output_dir)

@@ -1,3 +1,8 @@
+"""
+Configuration definitions for the AlphaEarth embedding pipeline.
+Defines the PipelineConfig dataclass and YAML loading utilities.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -6,6 +11,11 @@ from pathlib import Path
 
 @dataclass(slots=True)
 class PipelineConfig:
+    """
+    Data class representing the configuration options for a pipeline run.
+    Stores paths, mode overrides, and Earth Engine specific parameters
+    like buffer size and required masks.
+    """
     fields_path: Path
     environment_path: Path
     output_path: Path
@@ -30,6 +40,9 @@ class PipelineConfig:
 
 
 def load_config(config_path: str | Path) -> PipelineConfig:
+    """
+    Loads pipeline configuration from a YAML file.
+    """
     path = Path(config_path)
     raw = _load_yaml_like(path.read_text())
     

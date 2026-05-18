@@ -1,3 +1,12 @@
+"""
+End-to-end workflow runner for generating clean AlphaEarth embeddings.
+This script orchestrates the full process:
+1. Validates the raw input CSV to ensure required columns exist.
+2. Runs the preprocessing script to generate field and environment datasets.
+3. Executes the main embedding pipeline (mock or earth-engine).
+4. Generates a final embedding quality summary report.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -17,6 +26,10 @@ def run(cmd: list[str]) -> None:
 
 
 def validate_input(raw_csv: Path, columns: dict, report_dir: Path) -> None:
+    """
+    Checks the raw input CSV for required columns mapped in the config.
+    Saves a validation report and raises an error if required data is missing.
+    """
     df = pd.read_csv(raw_csv)
 
     required = {
@@ -49,6 +62,10 @@ def validate_input(raw_csv: Path, columns: dict, report_dir: Path) -> None:
 
 
 def write_quality_report(output_csv: Path, report_dir: Path) -> None:
+    """
+    Reads the final generated embeddings and produces a summary report 
+    describing the confidence scores and quality flags.
+    """
     df = pd.read_csv(output_csv)
 
     report = {
@@ -70,6 +87,10 @@ def write_quality_report(output_csv: Path, report_dir: Path) -> None:
 
 
 def main() -> None:
+    """
+    Parses the workflow configuration and executes the end-to-end process:
+    validation -> preprocessing -> pipeline extraction -> reporting.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/clean_embedding_workflow.yaml")
     args = parser.parse_args()

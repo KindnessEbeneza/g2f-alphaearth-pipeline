@@ -1,229 +1,127 @@
 # G2F AlphaEarth Pipeline
 
-A geospatial embedding pipeline for evaluating whether large-scale Earth observation foundation model embeddings can represent agricultural environments and support downstream ML tasks.
+A beginner-friendly geospatial embedding pipeline for evaluating whether large-scale Earth observation foundation model embeddings can represent agricultural environments and support downstream ML tasks for the Genomes to Fields (G2F) Initiative.
 
 ---
 
-## Overview
+## Goal & Objectives
 
 This project investigates the use of **Google AlphaEarth embeddings** for agricultural representation learning. The pipeline extracts geospatial embeddings from agricultural trial locations, applies spatial aggregation strategies, filters non-agricultural noise, and evaluates whether the resulting embeddings preserve meaningful agricultural structure.
 
 The core question: *can Earth observation foundation models produce embeddings that are useful for crop classification, yield modeling, environmental similarity analysis, and field-level prediction?*
 
----
-
-## Objectives
-
-- Evaluate whether AlphaEarth embeddings meaningfully represent agricultural environments
-- Reduce contamination from non-agricultural land cover around site coordinates
-- Compare point-based vs. buffered spatial representations
-- Experiment with cropland masking to better approximate real field conditions
-- Explore field delineation approaches for more accurate agricultural boundary extraction
-- Build a reproducible geospatial ML preprocessing pipeline for downstream modeling
+### Objectives
+- Evaluate whether AlphaEarth embeddings meaningfully represent agricultural environments.
+- Reduce contamination from non-agricultural land cover around site coordinates using spatial buffering and masking.
+- Build a reproducible geospatial ML preprocessing pipeline that merges Earth Engine extractions with Genomes to Fields phenotype data.
 
 ---
 
-## Pipeline Architecture
+## Implementation Details
 
-```
-Raw Site Coordinates
-        ↓
-Preprocessing & Cleaning
-        ↓
-AlphaEarth Embedding Extraction
-        ↓
-Spatial Aggregation
-  ├── Point-based embeddings
-  ├── Buffered embeddings
-  └── Cropland-masked buffered embeddings
-        ↓
-Embedding Evaluation
-  ├── Similarity analysis
-  ├── Spatial consistency checks
-  └── UMAP visualization
-        ↓
-Future Downstream ML Tasks
-```
+The pipeline is implemented in **Python (>=3.12)** and orchestrates data extraction and merging processes using the Earth Engine API.
 
----
+### Pipeline Modes
+The main extraction engine (`src/g2f_embeddings/pipeline.py`) supports multiple execution modes defined via YAML configurations:
+- **`mock`**: Fast testing mode that generates random mock embeddings locally to validate the data engineering pipeline without requiring Earth Engine credentials or internet access.
+- **`earth-engine-cropland-buffer`**: Generates a circular buffer around each site coordinate and samples embeddings across the region, applying an agricultural land cover mask to retain only cropland pixels. This reduces contamination from urban areas, forests, water, and roads.
 
-## Spatial Aggregation Strategies
-
-### 1. Point-Based Embeddings
-
-Extracts embeddings directly at the geographic coordinate of each agricultural site.
-
-**Pros:** Lightweight, scalable, preserves exact coordinate information.  
-**Cons:** Sensitive to geolocation noise; may capture roads, buildings, forests, or neighboring land cover rather than actual field conditions.
-
-### 2. Buffered Aggregation
-
-Generates a circular buffer around each site coordinate, samples embeddings across the buffered region, and aggregates statistics from all sampled pixels.
-
-Agricultural trial coordinates are often approximate and may not fall exactly inside a cultivated field. Buffering improves robustness by incorporating the surrounding agricultural landscape rather than relying on a single point.
-
-### 3. Cropland-Masked Buffering *(recommended)*
-
-Applies agricultural land cover masks to the buffered region, retaining only pixels classified as cropland before aggregating embeddings. This is the current stable approach.
-
-Reduces contamination from urban areas, forests, water, roads, and bare soil outside cultivated areas.
-
----
-
-## Datasets & Geospatial Resources
-
-| Dataset | Purpose |
-|---|---|
-| **AlphaEarth Embeddings** | Primary representation source; environmental similarity and agricultural embedding extraction |
-| **ESA WorldCereal** | Cropland mask for filtering agricultural pixels during spatial aggregation |
-| **USDA CDL** | Agricultural land cover validation and cropland masking for U.S.-based experiments |
-| **FTW (Field Delineation Workflow)** | Experimental; extracts approximate field boundaries to replace circular buffers |
-
-> **Note on FTW:** Field boundary inference is computationally expensive on local hardware and not yet integrated into the stable pipeline. Treat FTW experiments as exploratory extensions only.
-
----
-
-## Installation
-
-```bash
-# Clone the repository
-git clone <repository_url>
-cd g2f-alphaearth-pipeline
-
-# Create and activate environment
-conda create -n g2f-alphaearth python=3.10
-conda activate g2f-alphaearth
-
-# Install dependencies
-pip install -r requirements.txt
-```
+### Workflows
+End-to-end workflows are wrapped in `scripts/workflows/run_clean_embeddings.py` which:
+1. Validates the raw Genomes to Fields (G2F) CSV data.
+2. Extracts necessary `fields.csv` (coordinates) and `environment.csv` (metadata) via preprocessing scripts.
+3. Invokes the Earth Engine pipeline to compute the buffered and masked AlphaEarth embeddings.
+4. Produces quality reports and a final merged CSV containing site years and their corresponding vector embeddings.
 
 ---
 
 ## Project Structure
 
-```
+```text
 g2f-alphaearth-pipeline/
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── outputs/
-├── scripts/
-│   ├── preprocessing/
-│   ├── embeddings/
-│   ├── experiments/
-│   └── analysis/
-├── notebooks/
-├── results/
-├── figures/
-└── README.md
+├── configs/             # Pipeline and workflow YAML configurations (e.g. real_pipeline.yaml)
+├── data/                # Raw, processed, and output data directories (ignored by git)
+├── scripts/             # CLI entrypoints and experimental scripts
+│   ├── ftw/             # Experimental Field Delineation tools (Polygon extraction)
+│   ├── preprocess/      # Data preprocessing tools (e.g., build_inputs_from_pheno.py)
+│   ├── workflows/       # End-to-end workflow runner (run_clean_embeddings.py)
+│   └── run_pipeline.py  # Main entrypoint to extract embeddings
+├── src/                 # Core python package
+│   └── g2f_embeddings/  # Library for Earth Engine integration and data merging
+├── pyproject.toml       # Project metadata, dependencies, and build system
+├── Makefile             # Shortcut commands for running tests and pipelines
+└── uv.lock              # Lockfile for the `uv` package manager
 ```
 
 ---
 
-## Scripts
+## Setup & Installation
 
-| Script | Purpose |
-|---|---|
-| `preprocess_dataset.py` | Cleans and standardizes phenotype/site-year datasets |
-| `run_alphaearth_embeddings.py` | Extracts AlphaEarth embeddings from Google Earth Engine |
-| `run_buffered_embeddings.py` | Generates buffered agricultural embeddings around site coordinates |
-| `run_cropland_masked_embeddings.py` | Applies cropland filtering before embedding aggregation |
-| `compute_similarity_metrics.py` | Computes cosine similarity across spatial aggregation methods |
-| `generate_umap_visualizations.py` | Produces low-dimensional embedding visualizations |
-| `run_ftw_multisite_inference.py` | *(Experimental)* FTW-based field boundary extraction |
+### 1. Prerequisites
+- **Python >= 3.12**
+- **Earth Engine Account**: You need to have an active Google Earth Engine account and project set up for API access.
+
+### 2. Environment Setup
+
+Using `pip` or `uv`:
+```bash
+# Clone the repository
+git clone <repository_url>
+cd g2f-alphaearth-pipeline
+
+# Create a virtual environment
+python3.12 -m venv .venv
+source .venv/bin/activate
+
+# Install the package and dependencies
+make install
+# (Which runs: pip install -e ".[dev,ee]")
+```
+
+### 3. Earth Engine Authentication
+Authenticate your local environment to access Google Earth Engine:
+```bash
+earthengine authenticate
+```
+*(Follow the instructions to log in and set your Google Cloud project).*
 
 ---
 
-## Example Workflow
+## Usage
 
-**1. Preprocess input dataset**
+The project includes a `Makefile` with helpful shortcuts. 
+
+### 1. Preprocess Raw Data
+Extract fields and environment definitions from a raw Genomes to Fields phenotype CSV:
 ```bash
-python scripts/preprocessing/preprocess_dataset.py \
-  --input data/raw/phenotype.csv \
-  --output data/processed/site_years.csv
+make prep-pheno
 ```
 
-**2. Generate point-based embeddings**
+### 2. Run Local Mock Pipeline
+Verify the pipeline logic without calling Earth Engine:
 ```bash
-python scripts/embeddings/run_alphaearth_embeddings.py \
-  --input data/processed/site_years.csv \
-  --output data/outputs/point_embeddings.csv
+make run-mock
 ```
 
-**3. Generate buffered embeddings**
+### 3. Run Earth Engine Extraction
+Run the pipeline to fetch actual AlphaEarth embeddings (configured via `configs/real_pipeline.yaml`):
 ```bash
-python scripts/experiments/run_buffered_embeddings.py \
-  --input data/processed/site_years.csv \
-  --buffer_radius 100 \
-  --output data/outputs/buffered_embeddings.csv
+make run-real-ee
 ```
 
-**4. Run cropland-masked aggregation**
+### 4. End-to-End Clean Workflow
+Execute the entire validated data ingestion, extraction, and reporting workflow configured in `configs/clean_embedding_workflow.yaml`:
 ```bash
-python scripts/experiments/run_cropland_masked_embeddings.py \
-  --input data/processed/site_years.csv \
-  --buffer_radius 100 \
-  --output data/outputs/cropland_embeddings.csv
-```
-
-**5. Compute similarity metrics**
-```bash
-python scripts/analysis/compute_similarity_metrics.py \
-  --input data/outputs/cropland_embeddings.csv
-```
-
-**6. Generate UMAP visualizations**
-```bash
-python scripts/analysis/generate_umap_visualizations.py \
-  --input data/outputs/cropland_embeddings.csv
+make run-clean
 ```
 
 ---
 
-## Experimental: FTW Field Delineation
-
+## Experimental Tools
+Scripts under `scripts/ftw/` explore field delineation boundaries (polygons) instead of point or buffer radii. These approaches are computationally heavier and can be explored directly:
 ```bash
-# Single-site inference
-python scripts/experiments/run_ftw_single_site.py
-
-# Multi-site inference
-python scripts/experiments/run_ftw_multisite_inference.py
+python scripts/ftw/extract_polygon_alphaearth_embedding.py --help
 ```
 
-> FTW inference is computationally intensive. Large multi-site runs may exhaust memory or overheat local hardware. This workflow is not part of the stable pipeline.
-
 ---
-
-## Current Findings
-
-- Point embeddings are highly sensitive to spatial noise
-- Buffered aggregation improves embedding stability
-- Cropland masking significantly reduces non-agricultural contamination
-- Restricting aggregation to cropland-only pixels measurably improves agricultural representation quality
-
-### Known Bottlenecks
-
-- Mixed land cover persists even with buffering
-- Many agricultural coordinates do not align precisely with field boundaries
-- Accurate field delineation remains computationally expensive
-- Large-scale geospatial inference requires significant compute resources
-
----
-
-## Future Work
-
-- Improved field delineation methods
-- Better agricultural masking strategies
-- Temporal embedding aggregation
-- Integration with crop yield datasets
-
----
-
-## Tech Stack
-
-Python · Google Earth Engine · AlphaEarth · USDA CDL · ESA WorldCereal · GeoPandas · NumPy · Pandas · Scikit-learn · UMAP
-
----
-
 *Research focus: Geospatial AI · Agricultural ML · Remote Sensing · Representation Learning · Earth Observation Foundation Models*

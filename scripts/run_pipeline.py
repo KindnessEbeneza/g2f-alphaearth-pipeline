@@ -1,3 +1,9 @@
+"""
+Command-line entrypoint for running the AlphaEarth embedding pipeline.
+Allows configuration via YAML files and overriding the execution mode
+(e.g., mock vs. earth-engine). Also provides a preview mode to inspect outputs.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -34,6 +40,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """
+    Main entrypoint: parses arguments, loads the configuration, and runs the pipeline.
+    If --preview-only is set, it skips execution and prints the existing output.
+    """
     args = parse_args()
     config = load_config(args.config)
 

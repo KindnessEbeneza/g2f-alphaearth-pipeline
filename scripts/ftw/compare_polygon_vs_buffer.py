@@ -1,3 +1,8 @@
+"""
+Analytical script to compare embeddings generated via circular buffering 
+vs. precise field delineation polygons using cosine similarity.
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -12,6 +17,7 @@ OUTPUT_PATH = Path("data/outputs/ftw_test/site_2024/polygon_vs_buffer_similarity
 
 
 def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+    """Computes the cosine similarity between two numeric vectors."""
     a_norm = np.linalg.norm(a)
     b_norm = np.linalg.norm(b)
 
@@ -22,6 +28,11 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
 
 
 def main() -> None:
+    """
+    Reads the polygon-derived embedding and buffer-derived embeddings, 
+    computes the cosine similarities across different configurations, 
+    and saves a comparison report.
+    """
     polygon = pd.read_csv(POLYGON_PATH)
     buffers = pd.read_csv(BUFFER_PATH)
 

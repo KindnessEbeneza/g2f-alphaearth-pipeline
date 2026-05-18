@@ -1,3 +1,9 @@
+"""
+Core pipeline orchestrator for extracting and merging AlphaEarth embeddings.
+Reads field coordinates and metadata, dispatches to the correct extraction engine
+(mock or earth-engine), and merges the results into a single output dataframe.
+"""
+
 from __future__ import annotations
 
 import pandas as pd
@@ -39,6 +45,20 @@ def _validate_required_columns(
 
 
 def run_pipeline(config: PipelineConfig) -> pd.DataFrame:
+    """
+    Executes the embedding extraction pipeline based on the provided configuration.
+    
+    Loads input field and environment data, validates schemas, dispatches to the
+    appropriate embedding generation function (e.g., mock or earth-engine-cropland-buffer),
+    and joins the resulting embeddings with the environment metadata.
+    
+    Args:
+        config (PipelineConfig): The parsed configuration object.
+        
+    Returns:
+        pd.DataFrame: A merged dataframe containing the original environment data
+                      alongside the extracted embedding vectors and quality flags.
+    """
     fields = load_fields(config.fields_path)
     environment = load_environment(config.environment_path)
 
