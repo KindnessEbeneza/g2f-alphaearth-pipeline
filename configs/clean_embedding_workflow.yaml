@@ -10,7 +10,7 @@ columns:
 preprocess:
   output_dir: data/real
   min_year: 2017
-  max_rows: 10
+  
 
 pipeline:
   config_path: configs/real_pipeline.yaml
